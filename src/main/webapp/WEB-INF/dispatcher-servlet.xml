@@ -12,6 +12,7 @@
 
     <mvc:annotation-driven>
         <mvc:message-converters>
+            <!--配置编码-->
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
                 <property name="supportedMediaTypes">
                     <list>
@@ -20,6 +21,7 @@
                     </list>
                 </property>
             </bean>
+            <!--springmvc反序列化的配置-->
             <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
                 <property name="supportedMediaTypes">
                     <list>

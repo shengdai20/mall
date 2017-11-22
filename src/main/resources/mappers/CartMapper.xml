@@ -116,119 +116,55 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <resultMap id="BaseResultMap" type="com.mall.pojo.Cart">
-    <constructor>
-      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="product_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="quantity" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="checked" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
-      <arg column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
-    </constructor>
-  </resultMap>
-  <sql id="Base_Column_List">
-    id, user_id, product_id, quantity, checked, create_time, update_time
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from cart
-    where id = #{id,jdbcType=INTEGER}
+
+  <select id="selectCartByUserIdProductId" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM cart
+    WHERE user_id = #{userId}
+    AND product_id = #{productId}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from cart
-    where id = #{id,jdbcType=INTEGER}
+  
+  <select id="selectCartByUserId" resultMap="BaseResultMap" parameterType="int">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM cart
+    WHERE user_id = #{userId}
+  </select>
+  
+  <select id="selectCartProductCheckedStatusByUserId" resultType="int" parameterType="int">
+    SELECT count(1)
+    FROM cart
+    WHERE checked = 0
+    AND user_id = #{userId}
+  </select>
+  
+  <delete id="deleteByUserIdProductIds" parameterType="map">
+    DELETE FROM cart
+    WHERE user_id = #{userId}
+    <if test = "productIdList != null">
+      AND product_id IN
+      <foreach collection="productIdList" item = "item" index = "index" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
   </delete>
-  <insert id="insert" parameterType="com.mall.pojo.Cart">
-    insert into cart (id, user_id, product_id, 
-      quantity, checked, create_time, 
-      update_time)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{productId,jdbcType=INTEGER}, 
-      #{quantity,jdbcType=INTEGER}, #{checked,jdbcType=INTEGER},now(),
-      now())
-  </insert>
-  <insert id="insertSelective" parameterType="com.mall.pojo.Cart">
-    insert into cart
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
-      <if test="userId != null">
-        user_id,
-      </if>
-      <if test="productId != null">
-        product_id,
-      </if>
-      <if test="quantity != null">
-        quantity,
-      </if>
-      <if test="checked != null">
-        checked,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="userId != null">
-        #{userId,jdbcType=INTEGER},
-      </if>
-      <if test="productId != null">
-        #{productId,jdbcType=INTEGER},
-      </if>
-      <if test="quantity != null">
-        #{quantity,jdbcType=INTEGER},
-      </if>
-      <if test="checked != null">
-        #{checked,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null">
-        now(),
-      </if>
-      <if test="updateTime != null">
-        now(),
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.mall.pojo.Cart">
-    update cart
-    <set>
-      <if test="userId != null">
-        user_id = #{userId,jdbcType=INTEGER},
-      </if>
-      <if test="productId != null">
-        product_id = #{productId,jdbcType=INTEGER},
-      </if>
-      <if test="quantity != null">
-        quantity = #{quantity,jdbcType=INTEGER},
-      </if>
-      <if test="checked != null">
-        checked = #{checked,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        update_time = now(),
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
+
+  <update id="checkedOrUncheckedProduct" parameterType="map">
+    UPDATE cart
+    SET checked = #{checked},
+    update_time = now()
+    WHERE user_id = #{userId}
+    <if test="productId != null">
+      AND product_id = #{productId}
+    </if>
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.mall.pojo.Cart">
-    update cart
-    set user_id = #{userId,jdbcType=INTEGER},
-      product_id = #{productId,jdbcType=INTEGER},
-      quantity = #{quantity,jdbcType=INTEGER},
-      checked = #{checked,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = now()
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
+  <!--如果userId不存在，如果只用sum(quantity)就会返回一个null空，而空是不能赋值给基本类型int的，所以在这里对返回值做了一个处理，用IFNULL函数，如果sum是null，就会赋一个默认值0返回-->
+  <select id="selectCartProductCount" parameterType="int" resultType="int">
+    SELECT
+    IFNULL(SUM(quantity), 0) AS count
+    FROM cart
+    WHERE user_id = #{userId}
+  </select>
 </mapper>

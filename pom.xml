@@ -13,6 +13,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 
+    <!--常量，下面可以直接引用-->
     <org.springframework.version>4.0.0.RELEASE</org.springframework.version>
     <org.mybatis.version>3.4.1</org.mybatis.version>
     <org.mybatis.spring.version>1.3.0</org.mybatis.spring.version>
@@ -29,6 +30,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
+      <!--这里引用了上面的version常量-->
       <version>${org.springframework.version}</version>
     </dependency>
 
@@ -80,12 +82,14 @@
       <version>1.6.11</version>
     </dependency>
 
+    <!--json序列化和反序列化-->
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.12</version>
     </dependency>
 
+    <!--连接池-->
     <dependency>
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
@@ -93,7 +97,7 @@
       <!--<scope>runtime</scope>-->
     </dependency>
 
-
+    <!--logback日志-->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -107,18 +111,19 @@
       <scope>compile</scope>
     </dependency>
 
+    <!--mysql驱动-->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.18</version>
     </dependency>
 
+    <!--guava工具类-->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>20.0</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -244,7 +249,7 @@
   </dependencies>
 
   <build>
-    <finalName>mmall</finalName>
+    <finalName>mall</finalName>
     <plugins>
       <plugin>
         <groupId>org.mybatis.generator</groupId>
@@ -264,6 +269,7 @@
           <source>1.8</source>
           <target>1.8</target>
           <encoding>UTF-8</encoding>
+          <!--有些jar包maven没有，需要我们手动导入，此时就需要配置如下，让maven自动去引用和编译下面目录中的jar包-->
           <compilerArguments>
             <extdirs>${project.basedir}/src/main/webapp/WEB-INF/lib</extdirs>
           </compilerArguments>

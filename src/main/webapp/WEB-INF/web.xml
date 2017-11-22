@@ -6,29 +6,36 @@
 
     <display-name>Archetype Created Web Application</display-name>
 
+    <!--过滤器的配置，转码作用，也就是-->
     <filter>
         <filter-name>characterEncodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
         <init-param>
+            <!--字符集，即将过滤到的request的字符集设置为encoding指定的值，如UTF-8等-->
             <param-name>encoding</param-name>
             <param-value>UTF-8</param-value>
         </init-param>
         <init-param>
+            <!--这个参数的值只不过是指定response的字符集是否也设置成encoding所指定的字符集，所以你可以选择设置为true或false，当值为true时，表示与encoding相同-->
             <param-name>forceEncoding</param-name>
             <param-value>true</param-value>
         </init-param>
     </filter>
     <filter-mapping>
         <filter-name>characterEncodingFilter</filter-name>
+        <!--拦截的路径是/*，也就是所有路径都拦截-->
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
 
     <listener>
+        <!--将Spring容器与Web容器结合的更加密切，可选配置-->
+        <!--只负责监听web容器启动和关闭的监听器-->
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
 
     <listener>
+        <!--将Web容器与spring容器整合的监听器，必选配置，通过下面配置的applicationContext.xml将web容器和spring进行整合-->
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     <context-param>
@@ -38,14 +45,14 @@
         </param-value>
     </context-param>
 
+    <!--配置springmvc，拦截下面配置的*.do的所有请求，-->
     <servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-->=0时，容器启动时就会初始化servlet，也就是调用DispatcherServlet中的init()方法-->
+        <!--<0或者不指定时，这个servlet被使用时才会被加载-->
         <load-on-startup>1</load-on-startup>
     </servlet>
-
-
-
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>*.do</url-pattern>
