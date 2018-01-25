@@ -109,7 +109,7 @@ public class UserController {
      * @param username
      * @param question
      * @param answer
-     * @return
+     * @return 无重复token
      */
     @RequestMapping(value = "forget_check_answer.do", method = RequestMethod.POST)
     @ResponseBody
@@ -174,7 +174,9 @@ public class UserController {
     }
 
     /**
-     * 登录状态下获取用户个人信息
+     * 登录状态下获取用户个人信息，要与上面的get_user_info区别开来，
+     * 上面的没查数据库，直接从session获取的用户登录状态信息，不需要详细信息返回，比如右上角显示用户名等。
+     * 而这个这个查数据库了，是查询用户详细信息，是点击查询个人信息按钮得到的
      * @param session
      * @return
      */

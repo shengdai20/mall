@@ -39,7 +39,7 @@ public class UserServiceImpl implements IUserService {
         }
         //密码登录MD5，将密码加密后再与数据库中的密码进行比对，因为数据库中存的不是明文密码，是md5加密后的密码
         String md5Password = MD5Util.MD5EncodeUtf8(password);
-        //根据用户名校验密码是否正确
+        //这里不是根据用户名校验密码是否正确，而是将用户名和密码同时传入dao层，在数据库中一起校验是否有当前用户存在，如果存在表明校验通过返回该用户对象
         User user = userMapper.selectLogin(username, md5Password);
         if (user == null) {
             return ServerResponse.createByErrorMessage("密码错误");
@@ -57,7 +57,7 @@ public class UserServiceImpl implements IUserService {
      * @return
      */
     public ServerResponse<String> register(User user) {
-        //因为下面的校验用户名和email具有相同的逻辑，所以可以集成放在一个函数中
+        //因为下面的校验用户名和email具有相同的逻辑，所以可以集成放在一个函数中，即checkValid函数，用第二个参数辨别传入的是用户名还是email，然后再校验
         //校验用户名是否已经存在
         ServerResponse validResponse = this.checkValid(user.getUsername(), Const.USERNAME);
         if (!validResponse.isSuccess()) {
@@ -69,6 +69,7 @@ public class UserServiceImpl implements IUserService {
             return validResponse;
         }
         //设置用户角色
+        //这里还是有点问题，注册的时候怎么区分是普通用户还是管理员？如果是由前端直接判断，那应该已经传入用户角色了啊，如果不是由前端判断，那这里应该加以判断吧？
         user.setRole(Const.Role.ROLE_CUSTOMER);
         //MD5加密，加密后再存入数据库
         user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
@@ -222,14 +223,14 @@ public class UserServiceImpl implements IUserService {
      */
     public ServerResponse<User> updateInformation(User user) {
         //username不能被更新
-        //email进行校验，校验新的email是不是已经存在，并且存在的email如果相同的话，不能是我们当前的这个用户
+        //email进行校验，校验新的email是不是已经存在，如果已经存在要是当前用户的email
         //这里email校验不能复用上面用过的checkEmail方法，因为这里是判断这个email是否已经存在于数据库中其他用户的，所以还要传入id
         int resultCount = userMapper.checkEmailByUserId(user.getEmail(), user.getId());
         if(resultCount > 0) {
             return ServerResponse.createByErrorMessage("email已经存在，请更换email再尝试更新");
         }
 
-        //更新到数据中
+        //更新到数据库中
         int updateCount = userMapper.updateByPrimaryKeySelective(user);
         if(updateCount > 0) {
             //将user对象返回controller进行显示

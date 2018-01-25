@@ -105,7 +105,7 @@ public class CategoryManageController {
      * 获取当前结点及孩子结点，并递归
      * @param session
      * @param categoryId
-     * @return
+     * @return 返回孩子id
      */
     @RequestMapping(value = "get_category_and_deep_children_category.do", method = RequestMethod.POST)
     @ResponseBody

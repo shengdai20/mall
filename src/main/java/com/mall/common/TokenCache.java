@@ -26,7 +26,8 @@ public class TokenCache {
     private static LoadingCache<String, String> localCache = CacheBuilder.newBuilder().initialCapacity(1000).maximumSize(10000).expireAfterAccess(12, TimeUnit.HOURS).build(
             new CacheLoader<String, String>() {
                 //默认的数据加载实现，当调用get取值的时候，如果key没有对应的值，就调用这个方法进行加载
-                //当本地缓存命没有中时，调用load方法获取结果并将结果缓存
+                //当本地缓存没有命中时，调用load方法获取结果并将结果缓存
+                //因为这里不需要把token存入数据库，也就在本地缓存没有命中时，不需要去查具体结果，所以这里直接返回一个null
                 @Override
                 public String load(String s) throws Exception {
                     //因为key和value都是String类型,在下面调用getKey时返回的value值也是String类型，虽然有可能是null值但是也是string类型，所以这里返回"null"而不是null
