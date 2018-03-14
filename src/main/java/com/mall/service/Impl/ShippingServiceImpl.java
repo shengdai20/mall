@@ -101,7 +101,7 @@ public class ShippingServiceImpl implements IShippingService {
         List<Shipping> shippingList = shippingMapper.selectByUserId(userId);
         //将查询结果放入PageInfo中进行分页
         PageInfo pageInfo = new PageInfo(shippingList);
-        //将pageInfo返回给前端进行显示
+        //将pageInfo返回给前端进行显示，这次都没有转成vo啊
         return ServerResponse.createBySuccess(pageInfo);
     }
 }

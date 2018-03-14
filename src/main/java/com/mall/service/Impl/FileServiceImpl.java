@@ -24,7 +24,7 @@ public class FileServiceImpl implements IFileService{
      * 上传图片文件到服务器
      * @param file 要上传的图片文件
      * @param path 上传路径
-     * @return
+     * @return 上传成功后的文件名返回
      */
     public String upload(MultipartFile file, String path) {
         //获取原始文件名
@@ -41,7 +41,11 @@ public class FileServiceImpl implements IFileService{
         File fileDir = new File(path);
         if(!fileDir.exists()) {
             //如果不存在
+            //赋予这个文件fileDir可写
             fileDir.setWritable(true);
+            //创建文件
+            //mkdir()：当前级别
+            //mkdirs()：如果上传的文件所在的文件是/a,/b,/c等，直接传到服务器上时，这些文件夹都没有，用mkdirs()就可以自动创建
             fileDir.mkdirs();
         }
         File targetFile = new File(path, uploadFileName);
@@ -49,8 +53,9 @@ public class FileServiceImpl implements IFileService{
         try {
             file.transferTo(targetFile);
             //文件已经上传成功了
+            //将targetFile上传到我们的ftp服务器上
             FTPUtil.uploadFile(Lists.newArrayList(targetFile));
-            //已经上传到ftp服务器上
+            //已经上 传到ftp服务器上，删除upload下面的文件
             targetFile.delete();
         } catch (IOException e) {
             logger.error("上传文件异常", e);

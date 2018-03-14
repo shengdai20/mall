@@ -51,11 +51,13 @@ public class ProductServiceImpl implements IProductService{
                 //将子图分割成数组，也就是把多张子图分成一张张的图片
                 String[] subImageArray = product.getSubImages().split(",");
                 if(subImageArray.length > 0) {
-                    //将子图作为我们的主图
+                    //将子图第一个图片作为我们的主图
                     product.setMainImage(subImageArray[0]);
                 }
             }
             //根据传入的product是否有id，来判断是增加商品还是更新商品
+            //因为product的id是自增的，所以如果是新增商品传进来的时候还没有id，而如果是更新商品，则有id
+            // 因此不用查数据库就可以知道是新增商品还是更新商品
             if(product.getId() != null) {
                 //如果有id，是更新商品
                 //将product商品更新到数据库中
@@ -150,6 +152,7 @@ public class ProductServiceImpl implements IProductService{
             productDetailVo.setParentCategoryId(category.getParentId());
         }
         //时间转换，因为要将从数据库中拿到的时间转换为容易阅读的时间格式
+        //mybatis中获取过来的是ms级别的，转换为年月日标准
         productDetailVo.setCreateTime(DateTimeUtil.dateToStr(product.getCreateTime()));
         productDetailVo.setUpdateTime(DateTimeUtil.dateToStr(product.getUpdateTime()));
         return productDetailVo;
@@ -168,7 +171,7 @@ public class ProductServiceImpl implements IProductService{
 
         //2.填充自己的sql查询逻辑
         //从数据库中按分页查出所有product信息
-        //这里到底是先分页再查询还是先查询再分页？
+        //这里到底是先分页再查询还是先查询再分页？我觉得是先查询出所有的后分页，虽然这里加了limit语句
         //这里pageHelper会在sql语句中自动加入limit语句，这样在数据库层就实现了分页查询而不用把所有数据都查出来之后再进行分页处理
         List<Product> productList = productMapper.selectList();
         //创建vo对象
@@ -274,7 +277,7 @@ public class ProductServiceImpl implements IProductService{
 
         //如果分类id非空
         if(categoryId != null) {
-            //根据分类id查处该分类对象
+            //根据分类id查出该分类对象
             Category category = categoryMapper.selectByPrimaryKey(categoryId);
             //如果没有该分类对象，且keyword关键字也为空
             if(category == null && StringUtils.isBlank(keyword)) {
@@ -318,7 +321,7 @@ public class ProductServiceImpl implements IProductService{
             ProductListVo productListVo = assembleProductListVo(product);
             productListVoList.add(productListVo);
         }
-        //将查询结果放入pageInfo中，在此才开始分页？
+        //将查询结果放入pageInfo中，在此才开始分页
         PageInfo pageInfo = new PageInfo(productList);
         pageInfo.setList(productListVoList);
 

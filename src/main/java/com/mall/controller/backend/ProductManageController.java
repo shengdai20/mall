@@ -159,12 +159,13 @@ public class ProductManageController {
 
     /**
      * 上传图片文件到ftp服务器
-     * @param file 要上传的图片文件
+     * @param file 要上传的图片文件，从前端获取
      * @param request
      * @return
      */
     @RequestMapping(value = "upload.do", method = RequestMethod.POST)
     @ResponseBody
+    //jsp中form表单中的name与这里的value值要相同
     public ServerResponse upload(HttpSession session, @RequestParam(value = "uploadFile", required = false) MultipartFile file, HttpServletRequest request) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if(user == null) {
@@ -175,12 +176,12 @@ public class ProductManageController {
             //这个路径上传完之后会自动创建到发布之后的webapp下，与WEB-INF同级，也就是会自动创建一个upload文件夹
             String path = request.getSession().getServletContext().getRealPath("upload");
             String targetFileName = iFileService.upload(file, path);
+            //将url返回给前端
             String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
-
             Map fileMap = Maps.newHashMap();
-            fileMap.put("url", targetFileName);
+            fileMap.put("uri", targetFileName);
             fileMap.put("url", url);
-            return ServerResponse.createBySuccess();
+            return ServerResponse.createBySuccess(fileMap);
         }
         else {
             return ServerResponse.createByErrorMessage("无权限操作");
@@ -206,6 +207,13 @@ public class ProductManageController {
             return resultMap;
         }
         //富文本对于返回值有自己的要求，我们使用的是simditor的要求进行返回
+        //要求的返回json格式：
+        // {
+        //      "success":true/false,
+        //      "msg":...,
+        //      "file_path":(real_file_path)
+        // }
+        // 在这里用map承接返回
         if(iUserService.checkAdminRole(user).isSuccess()) {
             //request.getSession().getServletContext() 获取的是Servlet容器对象，相当于tomcat容器了。
             // getRealPath("/") 获取实际路径，“/”指代项目根目录，所以代码返回的是项目在容器中的实际发布运行的根路径
@@ -222,6 +230,7 @@ public class ProductManageController {
             resultMap.put("msg", "上传成功");
             resultMap.put("file_path", url);
 
+            //处理header，是simditor要求的
             response.addHeader("Access-Control-Allow-Headers", "X-File-Name");
             return resultMap;
         }

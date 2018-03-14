@@ -27,8 +27,8 @@ public class CartController {
     /**
      * 添加购物车
      * @param session
-     * @param count
-     * @param productId
+     * @param count 商品数量
+     * @param productId 商品id
      * @return
      */
     @RequestMapping(value = "add.do", method = RequestMethod.POST)
