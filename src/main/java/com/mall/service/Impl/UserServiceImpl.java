@@ -2,12 +2,12 @@ package com.mall.service.Impl;
 
 import com.mall.common.Const;
 import com.mall.common.ServerResponse;
-import com.mall.common.TokenCache;
 import com.mall.dao.UserMapper;
 import com.mall.pojo.User;
 import com.mall.service.IUserService;
 import com.mall.util.MD5Util;
-import org.apache.commons.lang3.ClassUtils;
+import com.mall.util.RedisPoolUtil;
+import com.mall.util.RedisShardedPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -145,7 +145,10 @@ public class UserServiceImpl implements IUserService {
             //利用UUID创建无重复token
             String forgetToken = UUID.randomUUID().toString();
             //把token放入本地cache中，然后设置其有效期
-            TokenCache.setKey(TokenCache.TOKEN_PREFIX + username, forgetToken);
+        //    TokenCache.setKey(TokenCache.TOKEN_PREFIX + username, forgetToken);
+
+            RedisShardedPoolUtil.setEx(Const.TOKEN_PREFIX + username, forgetToken, 60 * 60 * 12);
+
             //为什么这里调用的是泛型参数函数而不是string参数函数
             return ServerResponse.createBySuccess(forgetToken);
         }
@@ -171,7 +174,10 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("用户不存在");
         }
         //从cache中获取token，根据key拿到value值
-        String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX + username);
+    //    String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX + username);
+
+        String token = RedisShardedPoolUtil.get(Const.TOKEN_PREFIX + username);
+
         //校验cache中的token是否有效
         if(StringUtils.isBlank(token)) {
             return ServerResponse.createByErrorMessage("token无效或者过期");

@@ -6,6 +6,7 @@ import com.mall.common.ServerResponse;
 import com.mall.dao.CategoryMapper;
 import com.mall.pojo.Category;
 import com.mall.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,12 +21,13 @@ import java.util.Set;
  * Created by cq on 2017/11/3.
  */
 @Service("iCategoryService")
+@Slf4j
 public class CategoryServiceImpl implements ICategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
 
-    private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+//    private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     /**
      * 增加分类
@@ -85,7 +87,8 @@ public class CategoryServiceImpl implements ICategoryService {
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
         //如果当前分类下没有子分类，不需要返回特别的信息，返回的时候就是null，但是可以将其信息打印到日志中供查看
         if(CollectionUtils.isEmpty(categoryList)) {
-            logger.info("未找到当前分类的子分类");
+   //         logger.info("未找到当前分类的子分类");
+            log.info("未找到当前分类的子分类");
         }
 
         return ServerResponse.createBySuccess(categoryList);

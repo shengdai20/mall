@@ -13,6 +13,11 @@ public class Const {
 
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
+    public static final String TOKEN_PREFIX = "token_";
+
+    public interface RedisCacheExtime{
+        int REDIS_SESSION_EXTIME = 60 * 30;//30分钟
+    }
 
     public interface ProductListOrderBy {
         //用guava库初始化对象，里面初始化了两个值，一个是price_desc，一个是price_asc
